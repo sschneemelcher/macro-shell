@@ -8,10 +8,16 @@ macro_rules! shell {
         let mut cmd = Command::new(stringify! {$cmd});
         // cmd.args(vec! {$($arg) *});
         match cmd.spawn() {
-            Ok(mut child) => match child.stdout.take() {
-                None => {}
-                Some(output) => println! {"{:#?}", output},
-            },
+            Ok(mut child) => {
+                match child.wait() {
+                    Ok(_) => {}
+                    Err(e) => println!("{:#?}", e),
+                }
+                match child.stdout.take() {
+                    None => {}
+                    Some(output) => println! {"{:#?}", output},
+                }
+            }
             Err(_) => println! {"{}: command not found", stringify! {$cmd}},
         }
     };
